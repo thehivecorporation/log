@@ -59,8 +59,13 @@ func main() {
 	log.Debug("You shouldn't be reading this debug message")
 
 	//Now with statsd
-	log.SetWriter(text.New(os.Stdout))
-	log.SetTelemetry(statsd.New("localhost:9125"))
+	log.SetLevel(log.LevelDebug)
+	log.SetWriter(json.New(os.Stdout))
+	log.SetTelemetry(statsd.New(statsd.Conf{
+		Address:   "localhost:9125",
+		Namespace: "myapp.",
+	}))
+
 	log.WithField("key", "value").WithTags("tag1").Inc("mycounter", 1).Info("incremented")
 
 	//Now with prometheus
