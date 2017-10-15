@@ -11,11 +11,20 @@ type telemetryImpl struct {
 	c *statsd_client.Client
 }
 
-func New(address string) log.Telemetry {
-	c, err := statsd_client.New(address)
+type Conf struct {
+	Address   string
+	Namespace string
+	Tags      []string
+}
+
+func New(conf Conf) log.Telemetry {
+	c, err := statsd_client.New(conf.Address)
 	if err != nil {
 		log.WithError(err).Fatal("Could not open statsD client")
 	}
+
+	c.Namespace = conf.Namespace
+	c.Tags = conf.Tags
 
 	return &telemetryImpl{
 		c: c,
