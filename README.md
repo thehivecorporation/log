@@ -107,4 +107,5 @@ type Telemetry interface {
 * **StatsD**
 * **Prometheus**
 * **InfluxDB**
+* **Multi** (alpha) to monitor using more than one system
 * TODO OpenTSDB

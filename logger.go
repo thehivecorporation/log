@@ -34,7 +34,7 @@ func (l logger) fillErrors(mapkey string, err error) {
 }
 
 func (l logger) WithError(errs ...error) Logger {
-	if len(errs) == 0 {
+	if len(errs) == 1 {
 		l.fillErrors("error", errs[0])
 	} else {
 		for i, err := range errs {
