@@ -24,15 +24,6 @@ func (l logger) WithErrors(errs ...error) Logger {
 	return l.WithError(errs...)
 }
 
-func (l logger) fillErrors(mapkey string, err error) {
-	switch e := err.(type) {
-	case *juju_err.Err:
-		l.errors = e.StackTrace()
-	default:
-		l.fields[mapkey] = removeRootFromPath(e.Error())
-	}
-}
-
 func (l logger) WithError(errs ...error) Logger {
 	if len(errs) == 1 {
 		l.fillErrors("error", errs[0])
@@ -159,4 +150,13 @@ func removeRootFromPath(s string) string {
 	i := strings.Index(s, "go/src")
 
 	return s[i+7:]
+}
+
+func (l logger) fillErrors(mapkey string, err error) {
+	switch e := err.(type) {
+	case *juju_err.Err:
+		l.errors = e.StackTrace()
+	default:
+		l.fields[mapkey] = removeRootFromPath(e.Error())
+	}
 }

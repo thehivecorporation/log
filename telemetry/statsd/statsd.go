@@ -20,7 +20,7 @@ type Conf struct {
 func New(conf Conf) log.Telemetry {
 	c, err := statsd_client.New(conf.Address)
 	if err != nil {
-		log.WithError(err).Fatal("Could not open statsD client")
+		log.WithError(err).WithField("address", conf.Address).Fatal("Could not open statsD client")
 	}
 
 	c.Namespace = conf.Namespace
