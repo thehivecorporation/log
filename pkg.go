@@ -58,8 +58,8 @@ func Inc(name string, value float64) Logger {
 	return l
 }
 
-func WithError(err error) Logger {
-	return newLogger().WithError(err)
+func WithError(err ...error) Logger {
+	return newLogger().WithError(err...)
 }
 
 func SetLevel(l Level) {

@@ -67,7 +67,8 @@ type Logger interface {
 
 	WithField(s string, v interface{}) Logger
 	WithFields(Fields) Logger
-	WithError(error) Logger
+	WithError(...error) Logger
+	WithErrors(...error) Logger
 
 	WithTags(s ...string) Telemetry
 
