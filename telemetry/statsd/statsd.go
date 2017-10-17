@@ -38,7 +38,7 @@ func (s *telemetryImpl) WithTags(tags ...string) log.Telemetry {
 
 func (s *telemetryImpl) Inc(name string, value float64, extra ...interface{}) log.Logger {
 	if err := s.c.Incr(name, s.Tags, value); err != nil {
-		s.Logger.Error(err.Error())
+		s.Logger.WithError(err).WithFields(log.Fields{"tags": s.Tags}).Errorf("Error trying to increment metric '%s'", name)
 	}
 
 	return s.Logger
