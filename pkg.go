@@ -48,8 +48,12 @@ func WithField(s string, v interface{}) Logger {
 	return newLogger(2).WithField(s, v)
 }
 
-func WithTags(s ...string) Telemetry {
-	return newTelemetry(newLogger(1)).WithTags(s...)
+func WithTag(k, v string) Telemetry {
+	return newTelemetry(newLogger(1)).WithTag(k, v)
+}
+
+func WithTags(tags Tags) Telemetry {
+	return newTelemetry(newLogger(1)).WithTags(tags)
 }
 
 func Inc(name string, value float64) Logger {

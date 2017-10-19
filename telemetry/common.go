@@ -7,6 +7,6 @@ import (
 
 type Common struct {
 	Logger log.Logger
-	Tags   []string
+	Tags   log.Tags
 	Start  time.Time
 }

@@ -16,22 +16,22 @@ import (
 func main() {
 	log.WithField("hello", "world").Info("Hello from external/main.go")
 
-	log.WithTags("tag1", "tag2").
+	log.WithTags(log.Tags{"endpoint": "e1", "host": "h1"}).
 		Inc("counter", 1).
 		WithField("field", 2).
 		Info("Hello")
 
 	log.WithField("key1", 3).
-		WithTags("tag3").
-		WithTags("tag4").
+		WithTag("endpoint", "e2").
+		WithTag("endpoint", "e3").
 		Inc("counter", 1).
 		Info("Uf")
 
-	log.WithField("key2", "value").WithTags("tag5").WithTags("tag6").Inc("counter3", 11).Info("Uf2")
+	log.WithField("key2", "value").WithTag("db", "tag5").WithTag("endpoint", "tag6").Inc("counter3", 11).Info("Uf2")
 	log.Inc("counter3", 11).Info("Uf2")
 	log.WithField("errorkey", "errorvalue").Error("An error")
 	log.WithField("errorkey", "errorvalue").WithError(po_error.New("My error")).Error("Another error")
-	log.WithField("database", "users").WithTags("databases").Inc("counter", 1)
+	log.WithField("database", "users").WithTag("database", "db1").Inc("counter", 1)
 
 	err := errors.New("An error")
 	err = errors.Annotatef(err, "A wrapper")
@@ -66,7 +66,7 @@ func main() {
 		Namespace: "myapp.",
 	}))
 
-	log.WithField("key", "value").WithTags("tag1").Inc("mycounter", 1).Info("incremented")
+	log.WithField("key", "value").WithTag("endpoint", "e4").Inc("mycounter", 1).Info("incremented")
 
 	//Now with prometheus
 	prometheusTest()
@@ -100,6 +100,6 @@ func prometheusTest() {
 				Labels: []string{"some_label"},
 			}}))
 
-	log.WithTags("device").Inc("hd_errors_total", 1).Info("incremented")
-	log.WithTags("device").Inc("hd_errors_total", 1).WithField("objective", "device").Info("incremented")
+	log.WithTag("device", "d1").Inc("hd_errors_total", 1).Info("incremented")
+	log.WithTag("device", "d2").Inc("hd_errors_total", 1).WithField("objective", "device").Info("incremented")
 }

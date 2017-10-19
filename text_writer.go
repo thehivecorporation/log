@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
-	"time"
 	"sync"
+	"time"
 )
 
 type TextWriter struct {
@@ -32,7 +32,9 @@ func (w *TextWriter) WriteLog(p *Payload) {
 	}
 
 	if len(p.Tags) > 0 {
-		fmt.Fprintf(w.IOWriter, " \033[%dm%s\033[0m", Colors[p.Level], strings.Join(p.Tags, "|"))
+		for k, v := range p.Tags {
+			fmt.Fprintf(w.IOWriter, " \033[%dm%s|%s\033[0m", Colors[p.Level], k, v)
+		}
 	}
 
 	fmt.Fprintln(w.IOWriter)

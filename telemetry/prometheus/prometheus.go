@@ -57,8 +57,14 @@ func New(c Counters, g Gauges, h Histograms) log.Telemetry {
 	return &tel
 }
 
-func (p *telemetryImpl) WithTags(tags ...string) log.Telemetry {
-	p.Tags = append(p.Tags, tags...)
+func (p *telemetryImpl) WithTags(t log.Tags) log.Telemetry {
+	p.Tags = t
+
+	return p
+}
+
+func (p *telemetryImpl) WithTag(k, v string) log.Telemetry {
+	p.Tags[k] = v
 
 	return p
 }
@@ -69,7 +75,7 @@ func (p *telemetryImpl) Inc(name string, value float64, extra ...interface{}) lo
 		return p.Logger
 	}
 
-	p.counters[name].WithLabelValues(p.Tags...).Add(value)
+	p.counters[name].With(map[string]string(p.Tags)).Add(value)
 
 	return p.Logger
 }
@@ -80,7 +86,7 @@ func (p *telemetryImpl) Gauge(name string, value float64, extra ...interface{}) 
 		return p.Logger
 	}
 
-	p.gauges[name].WithLabelValues(p.Tags...).Set(value)
+	p.gauges[name].With(map[string]string(p.Tags)).Set(value)
 
 	return p.Logger
 }
@@ -91,7 +97,7 @@ func (p *telemetryImpl) Histogram(name string, value float64, extra ...interface
 		return p.Logger
 	}
 
-	p.histograms[name].WithLabelValues(p.Tags...).Observe(value)
+	p.histograms[name].With(map[string]string(p.Tags)).Observe(value)
 
 	return p.Logger
 }

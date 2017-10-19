@@ -48,7 +48,8 @@ var levelStrings = map[string]Level{
 	"fatal":   LevelFatal,
 }
 
-type Tags []string
+//type Tags []string
+type Tags map[string]string
 type Fields map[string]interface{}
 type Level int
 
@@ -70,7 +71,8 @@ type Logger interface {
 	WithError(...error) Logger
 	WithErrors(...error) Logger
 
-	WithTags(s ...string) Telemetry
+	WithTags(t Tags) Telemetry
+	WithTag(string, string) Telemetry
 
 	Clone(callStack int) Logger
 }
@@ -89,7 +91,8 @@ type Writer interface {
 }
 
 type Telemetry interface {
-	WithTags(s ...string) Telemetry
+	WithTags(t Tags) Telemetry
+	WithTag(string, string) Telemetry
 
 	Inc(name string, value float64, extra ...interface{}) Logger
 	Gauge(string, float64, ...interface{}) Logger

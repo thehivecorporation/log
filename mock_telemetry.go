@@ -7,7 +7,7 @@ import (
 
 type mockTelemetry struct {
 	Logger Logger
-	Tags   []string
+	Tags   Tags
 	Start  time.Time
 }
 
@@ -30,12 +30,17 @@ func (m *mockTelemetry) Inc(_ string, _ float64, _ ...interface{}) Logger {
 	return m.Logger
 }
 
-func (m *mockTelemetry) WithTags(s ...string) Telemetry {
-	m.Tags = append(m.Tags, s...)
+func (m *mockTelemetry) WithTag(k, v string) Telemetry {
+	m.Tags[k] = v
+	return m
+}
+
+func (m *mockTelemetry) WithTags(t Tags) Telemetry {
+	m.Tags = t
 	return m
 }
 
 func (m mockTelemetry) Clone() Telemetry {
-	m.Tags = make([]string, 0)
+	m.Tags = Tags{}
 	return &m
 }

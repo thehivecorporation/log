@@ -113,8 +113,12 @@ func (l logger) WithField(s string, v interface{}) Logger {
 	return &l
 }
 
-func (l *logger) WithTags(s ...string) Telemetry {
-	return newTelemetry(l).WithTags(s...)
+func (l *logger) WithTag(k string, v string) Telemetry {
+	return newTelemetry(l).WithTags(Tags{k: v})
+}
+
+func (l *logger) WithTags(tags Tags) Telemetry {
+	return newTelemetry(l).WithTags(tags)
 }
 
 func (l *logger) errJujuStack(msg string) Telemetry {

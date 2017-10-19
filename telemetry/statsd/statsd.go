@@ -1,6 +1,7 @@
 package statsd
 
 import (
+	"fmt"
 	statsd_client "github.com/DataDog/datadog-go/statsd"
 	"github.com/thehivecorporation/log"
 	"github.com/thehivecorporation/log/telemetry"
@@ -31,13 +32,18 @@ func New(conf Conf) log.Telemetry {
 	}
 }
 
-func (s *telemetryImpl) WithTags(tags ...string) log.Telemetry {
-	s.Tags = append(s.Tags, tags...)
+func (s *telemetryImpl) WithTag(k, v string) log.Telemetry {
+	s.Tags[k] = v
+	return s
+}
+
+func (s *telemetryImpl) WithTags(tags log.Tags) log.Telemetry {
+	s.Tags = tags
 	return s
 }
 
 func (s *telemetryImpl) Inc(name string, value float64, extra ...interface{}) log.Logger {
-	if err := s.c.Incr(name, s.Tags, value); err != nil {
+	if err := s.c.Incr(name, s.getTagsAr(), value); err != nil {
 		s.Logger.WithError(err).WithFields(log.Fields{"tags": s.Tags}).Errorf("Error trying to increment metric '%s'", name)
 	}
 
@@ -45,7 +51,7 @@ func (s *telemetryImpl) Inc(name string, value float64, extra ...interface{}) lo
 }
 
 func (s *telemetryImpl) Gauge(name string, value float64, extra ...interface{}) log.Logger {
-	if err := s.c.Gauge(name, value, s.Tags, 1); err != nil {
+	if err := s.c.Gauge(name, value, s.getTagsAr(), 1); err != nil {
 		s.Logger.Error(err.Error())
 	}
 
@@ -53,7 +59,7 @@ func (s *telemetryImpl) Gauge(name string, value float64, extra ...interface{}) 
 }
 
 func (s *telemetryImpl) Histogram(name string, value float64, extra ...interface{}) log.Logger {
-	if err := s.c.Histogram(name, value, s.Tags, 1); err != nil {
+	if err := s.c.Histogram(name, value, s.getTagsAr(), 1); err != nil {
 		s.Logger.Error(err.Error())
 	}
 
@@ -67,4 +73,15 @@ func (s telemetryImpl) Clone() log.Telemetry {
 
 func (s *telemetryImpl) SetLogger(l log.Logger) {
 	s.Logger = l
+}
+
+func (s *telemetryImpl) getTagsAr() (tagsAr []string) {
+	tagsAr = make([]string, len(s.Tags))
+	var i int
+	for k, v := range s.Tags {
+		tagsAr[i] = fmt.Sprintf("%s:%s", k, v)
+		i++
+	}
+
+	return tagsAr
 }
