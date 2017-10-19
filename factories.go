@@ -7,6 +7,6 @@ func newTelemetry(l Logger) Telemetry {
 	return t
 }
 
-func newLogger() Logger {
-	return loggerPrototype.Clone()
+func newLogger(callStack int) Logger {
+	return loggerPrototype.Clone(callStack)
 }

@@ -5,9 +5,11 @@ import (
 	"io"
 	"strings"
 	"time"
+	"sync"
 )
 
 type TextWriter struct {
+	sync.Mutex
 	IOWriter io.Writer
 }
 
@@ -16,6 +18,9 @@ func newTextWriter(w io.Writer) Writer {
 }
 
 func (w *TextWriter) WriteLog(p *Payload) {
+	w.Lock()
+	defer w.Unlock()
+
 	ts := time.Since(*p.Timestamp) / time.Second
 
 	for _, msg := range p.Messages {
