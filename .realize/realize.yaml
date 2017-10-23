@@ -1,0 +1,36 @@
+settings:
+  files:
+    outputs:
+      status: false
+      name: outputs.log
+    logs:
+      status: false
+      name: logs.log
+    errors:
+      status: false
+      name: errors.log
+  legacy:
+    force: false
+    interval: 100ms
+server:
+  status: true
+  open: true
+  host: localhost
+  port: 5001
+schema:
+- name: log
+  path: /home/caster/go/src/github.com/thehivecorporation/log
+  commands:
+    vet:
+      status: true
+    fmt:
+      status: true
+    build:
+      status: true
+  watcher:
+    paths:
+    - /
+    extensions:
+    - go
+    ignored_paths:
+    - vendor

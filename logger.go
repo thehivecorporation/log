@@ -163,6 +163,6 @@ func (l logger) fillErrors(mapkey string, err error) {
 	case *juju_err.Err:
 		l.errors = e.StackTrace()
 	default:
-		l.fields[mapkey] = removeRootFromPath(e.Error())
+		l.fields[mapkey] = e.Error()
 	}
 }
