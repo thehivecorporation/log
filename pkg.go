@@ -20,24 +20,24 @@ func Fatal(s string) Telemetry {
 	return newLogger(2).Fatal(s)
 }
 
-func Infof(s string) Telemetry {
-	return newLogger(2).Infof(s)
+func Infof(s string, i ...interface{}) Telemetry {
+	return newLogger(2).Infof(s, i...)
 }
 
-func Debugf(s string) Telemetry {
-	return newLogger(2).Debugf(s)
+func Debugf(s string, i ...interface{}) Telemetry {
+	return newLogger(2).Debugf(s, i...)
 }
 
-func Errorf(s string) Telemetry {
-	return newLogger(2).Errorf(s)
+func Errorf(s string, i ...interface{}) Telemetry {
+	return newLogger(2).Errorf(s, i...)
 }
 
-func Warnf(s string) Telemetry {
-	return newLogger(2).Warnf(s)
+func Warnf(s string, i ...interface{}) Telemetry {
+	return newLogger(2).Warnf(s, i...)
 }
 
-func Fatalf(s string) Telemetry {
-	return newLogger(2).Fatalf(s)
+func Fatalf(s string, i ...interface{}) Telemetry {
+	return newLogger(2).Fatalf(s, i...)
 }
 
 func WithFields(f Fields) Logger {

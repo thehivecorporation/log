@@ -158,7 +158,7 @@ func removeRootFromPath(s string) string {
 	return s[i+7:]
 }
 
-func (l logger) fillErrors(mapkey string, err error) {
+func (l *logger) fillErrors(mapkey string, err error) {
 	switch e := err.(type) {
 	case *juju_err.Err:
 		l.errors = e.StackTrace()
