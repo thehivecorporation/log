@@ -83,7 +83,7 @@ type Payload struct {
 	Fields    Fields     `json:"fields,omitempty"`
 	Timestamp *time.Time `json:"ts,omitempty"`
 	Tags      Tags       `json:"tags,omitempty"`
-	errors    []string
+	Errors    []string   `json:"Errors,omitempty"`
 }
 
 type Writer interface {

@@ -43,6 +43,10 @@ func main() {
 	log.SetWriter(json.New(os.Stdout))
 	log.Warn("Warn message")
 
+	err = errors.New("An error")
+	err = errors.Annotatef(err, "A wrapper")
+	log.WithError(err).Error("Error chungo")
+
 	log.SetWriter(text.New(os.Stdout))
 	log.Info("Changing level to info")
 	log.SetLevel(log.LevelInfo)

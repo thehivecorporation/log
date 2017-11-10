@@ -148,7 +148,7 @@ func (l *logger) writeLogCommon(msg string, level Level) {
 		Timestamp: &l.start,
 		Level:     level,
 		Fields:    l.fields,
-		errors:    l.errors,
+		Errors:    l.errors,
 	})
 }
 
@@ -161,7 +161,10 @@ func removeRootFromPath(s string) string {
 func (l *logger) fillErrors(mapkey string, err error) {
 	switch e := err.(type) {
 	case *juju_err.Err:
-		l.errors = e.StackTrace()
+		l.errors = make([]string, len(e.StackTrace()))
+		for i, subErr := range e.StackTrace() {
+			l.errors[i] = removeRootFromPath(subErr)
+		}
 	default:
 		l.fields[mapkey] = e.Error()
 	}

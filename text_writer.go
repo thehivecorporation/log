@@ -39,7 +39,7 @@ func (w *TextWriter) WriteLog(p *Payload) {
 
 	fmt.Fprintln(w.IOWriter)
 
-	for _, msg := range p.errors {
+	for _, msg := range p.Errors {
 		fmt.Fprintf(w.IOWriter, "\033[%dm%6s\033[0m[%04d]    %-25s\n", Colors[p.Level], strings.ToUpper(LevelNames[p.Level]), ts, msg)
 	}
 }
