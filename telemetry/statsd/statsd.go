@@ -2,7 +2,10 @@ package statsd
 
 import (
 	"fmt"
+	"time"
+
 	statsd_client "github.com/DataDog/datadog-go/statsd"
+	"github.com/bmhatfield/go-runtime-metrics/collector"
 	"github.com/thehivecorporation/log"
 	"github.com/thehivecorporation/log/telemetry"
 )
@@ -13,9 +16,17 @@ type telemetryImpl struct {
 }
 
 type Conf struct {
-	Address   string
-	Namespace string
-	Tags      []string
+	Address        string
+	Namespace      string
+	Tags           []string
+	CollectMetrics *MetricsCollector
+}
+
+type MetricsCollector struct {
+	PauseSeconds int
+	Cpu          bool
+	Mem          bool
+	Gc           bool
 }
 
 func New(conf Conf) log.Telemetry {
@@ -27,9 +38,31 @@ func New(conf Conf) log.Telemetry {
 	c.Namespace = conf.Namespace
 	c.Tags = conf.Tags
 
-	return &telemetryImpl{
+	tel := &telemetryImpl{
 		c: c,
 	}
+
+	if conf.CollectMetrics != nil {
+		runCollector(conf, tel)
+	}
+
+	return tel
+}
+
+func runCollector(c Conf, tel *telemetryImpl) (err error) {
+	gaugeFunc := func(key string, val uint64) {
+		tel.Gauge(key, float64(val), c.Tags)
+	}
+
+	collector := collector.New(gaugeFunc)
+	collector.PauseDur = time.Duration(c.CollectMetrics.PauseSeconds) * time.Second
+	collector.EnableCPU = c.CollectMetrics.Cpu
+	collector.EnableMem = c.CollectMetrics.Mem
+	collector.EnableGC = c.CollectMetrics.Gc
+
+	go collector.Run()
+
+	return
 }
 
 func (s *telemetryImpl) WithTag(k, v string) log.Telemetry {
