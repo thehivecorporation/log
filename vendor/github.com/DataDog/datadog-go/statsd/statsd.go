@@ -29,6 +29,7 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"net"
 	"strconv"
 	"strings"
 	"sync"
@@ -54,69 +55,34 @@ any number greater than that will see frames being cut out.
 */
 const MaxUDPPayloadSize = 65467
 
-/*
-UnixAddressPrefix holds the prefix to use to enable Unix Domain Socket
-traffic instead of UDP.
-*/
-const UnixAddressPrefix = "unix://"
-
-/*
-Stat suffixes
-*/
-var (
-	gaugeSuffix     = []byte("|g")
-	countSuffix     = []byte("|c")
-	histogramSuffix = []byte("|h")
-	decrSuffix      = []byte("-1|c")
-	incrSuffix      = []byte("1|c")
-	setSuffix       = []byte("|s")
-	timingSuffix    = []byte("|ms")
-)
-
-// A statsdWriter offers a standard interface regardless of the underlying
-// protocol. For now UDS and UPD writers are available.
-type statsdWriter interface {
-	Write(data []byte) error
-	SetWriteTimeout(time.Duration) error
-	Close() error
-}
-
-// A Client is a handle for sending messages to dogstatsd.  It is safe to
+// A Client is a handle for sending udp messages to dogstatsd.  It is safe to
 // use one Client from multiple goroutines simultaneously.
 type Client struct {
-	// Writer handles the underlying networking protocol
-	writer statsdWriter
+	conn net.Conn
 	// Namespace to prepend to all statsd calls
 	Namespace string
 	// Tags are global tags to be added to every statsd call
 	Tags []string
-	// skipErrors turns off error passing and allows UDS to emulate UDP behaviour
-	SkipErrors bool
 	// BufferLength is the length of the buffer in commands.
 	bufferLength int
 	flushTime    time.Duration
 	commands     []string
 	buffer       bytes.Buffer
-	stop         chan struct{}
+	stop         bool
 	sync.Mutex
 }
 
-// New returns a pointer to a new Client given an addr in the format "hostname:port" or
-// "unix:///path/to/socket".
+// New returns a pointer to a new Client given an addr in the format "hostname:port".
 func New(addr string) (*Client, error) {
-	if strings.HasPrefix(addr, UnixAddressPrefix) {
-		w, err := newUdsWriter(addr[len(UnixAddressPrefix)-1:])
-		if err != nil {
-			return nil, err
-		}
-		client := &Client{writer: w}
-		return client, nil
-	}
-	w, err := newUdpWriter(addr)
+	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
 		return nil, err
 	}
-	client := &Client{writer: w, SkipErrors: false}
+	conn, err := net.DialUDP("udp", nil, udpAddr)
+	if err != nil {
+		return nil, err
+	}
+	client := &Client{conn: conn}
 	return client, nil
 }
 
@@ -130,36 +96,20 @@ func NewBuffered(addr string, buflen int) (*Client, error) {
 	client.bufferLength = buflen
 	client.commands = make([]string, 0, buflen)
 	client.flushTime = time.Millisecond * 100
-	client.stop = make(chan struct{}, 1)
 	go client.watch()
 	return client, nil
 }
 
 // format a message from its name, value, tags and rate.  Also adds global
 // namespace and tags.
-func (c *Client) format(name string, value interface{}, suffix []byte, tags []string, rate float64) string {
+func (c *Client) format(name, value string, tags []string, rate float64) string {
 	var buf bytes.Buffer
 	if c.Namespace != "" {
 		buf.WriteString(c.Namespace)
 	}
 	buf.WriteString(name)
 	buf.WriteString(":")
-
-	switch val := value.(type) {
-	case float64:
-		buf.Write(strconv.AppendFloat([]byte{}, val, 'f', 6, 64))
-
-	case int64:
-		buf.Write(strconv.AppendInt([]byte{}, val, 10))
-
-	case string:
-		buf.WriteString(val)
-
-	default:
-		// do nothing
-	}
-	buf.Write(suffix)
-
+	buf.WriteString(value)
 	if rate < 1 {
 		buf.WriteString(`|@`)
 		buf.WriteString(strconv.FormatFloat(rate, 'f', -1, 64))
@@ -170,27 +120,17 @@ func (c *Client) format(name string, value interface{}, suffix []byte, tags []st
 	return buf.String()
 }
 
-// SetWriteTimeout allows the user to set a custom UDS write timeout. Not supported for UDP.
-func (c *Client) SetWriteTimeout(d time.Duration) error {
-	return c.writer.SetWriteTimeout(d)
-}
-
 func (c *Client) watch() {
-	ticker := time.NewTicker(c.flushTime)
-
-	for {
-		select {
-		case <-ticker.C:
-			c.Lock()
-			if len(c.commands) > 0 {
-				// FIXME: eating error here
-				c.flush()
-			}
-			c.Unlock()
-		case <-c.stop:
-			ticker.Stop()
+	for _ = range time.Tick(c.flushTime) {
+		if c.stop {
 			return
 		}
+		c.Lock()
+		if len(c.commands) > 0 {
+			// FIXME: eating error here
+			c.flush()
+		}
+		c.Unlock()
 	}
 }
 
@@ -260,7 +200,7 @@ func (c *Client) flush() error {
 	var err error
 	cmdsFlushed := 0
 	for i, data := range frames {
-		e := c.writer.Write(data)
+		_, e := c.conn.Write(data)
 		if e != nil {
 			err = e
 			break
@@ -290,54 +230,54 @@ func (c *Client) sendMsg(msg string) error {
 		return c.append(msg)
 	}
 
-	err := c.writer.Write([]byte(msg))
-
-	if c.SkipErrors {
-		return nil
-	}
+	_, err := c.conn.Write([]byte(msg))
 	return err
 }
 
 // send handles sampling and sends the message over UDP. It also adds global namespace prefixes and tags.
-func (c *Client) send(name string, value interface{}, suffix []byte, tags []string, rate float64) error {
+func (c *Client) send(name, value string, tags []string, rate float64) error {
 	if c == nil {
 		return nil
 	}
 	if rate < 1 && rand.Float64() > rate {
 		return nil
 	}
-	data := c.format(name, value, suffix, tags, rate)
+	data := c.format(name, value, tags, rate)
 	return c.sendMsg(data)
 }
 
 // Gauge measures the value of a metric at a particular time.
 func (c *Client) Gauge(name string, value float64, tags []string, rate float64) error {
-	return c.send(name, value, gaugeSuffix, tags, rate)
+	stat := fmt.Sprintf("%f|g", value)
+	return c.send(name, stat, tags, rate)
 }
 
 // Count tracks how many times something happened per second.
 func (c *Client) Count(name string, value int64, tags []string, rate float64) error {
-	return c.send(name, value, countSuffix, tags, rate)
+	stat := fmt.Sprintf("%d|c", value)
+	return c.send(name, stat, tags, rate)
 }
 
 // Histogram tracks the statistical distribution of a set of values.
 func (c *Client) Histogram(name string, value float64, tags []string, rate float64) error {
-	return c.send(name, value, histogramSuffix, tags, rate)
+	stat := fmt.Sprintf("%f|h", value)
+	return c.send(name, stat, tags, rate)
 }
 
 // Decr is just Count of -1
 func (c *Client) Decr(name string, tags []string, rate float64) error {
-	return c.send(name, nil, decrSuffix, tags, rate)
+	return c.send(name, "-1|c", tags, rate)
 }
 
 // Incr is just Count of 1
 func (c *Client) Incr(name string, tags []string, rate float64) error {
-	return c.send(name, nil, incrSuffix, tags, rate)
+	return c.send(name, "1|c", tags, rate)
 }
 
 // Set counts the number of unique elements in a group.
 func (c *Client) Set(name string, value string, tags []string, rate float64) error {
-	return c.send(name, value, setSuffix, tags, rate)
+	stat := fmt.Sprintf("%s|s", value)
+	return c.send(name, stat, tags, rate)
 }
 
 // Timing sends timing information, it is an alias for TimeInMilliseconds
@@ -348,7 +288,8 @@ func (c *Client) Timing(name string, value time.Duration, tags []string, rate fl
 // TimeInMilliseconds sends timing information in milliseconds.
 // It is flushed by statsd with percentiles, mean and other info (https://github.com/etsy/statsd/blob/master/docs/metric_types.md#timing)
 func (c *Client) TimeInMilliseconds(name string, value float64, tags []string, rate float64) error {
-	return c.send(name, value, timingSuffix, tags, rate)
+	stat := fmt.Sprintf("%f|ms", value)
+	return c.send(name, stat, tags, rate)
 }
 
 // Event sends the provided Event.
@@ -389,11 +330,8 @@ func (c *Client) Close() error {
 	if c == nil {
 		return nil
 	}
-	select {
-	case c.stop <- struct{}{}:
-	default:
-	}
-	return c.writer.Close()
+	c.stop = true
+	return c.conn.Close()
 }
 
 // Events support
@@ -521,6 +459,7 @@ func (e Event) Encode(tags ...string) (string, error) {
 }
 
 // ServiceCheck support
+
 type ServiceCheckStatus byte
 
 const (

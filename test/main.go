@@ -1,7 +1,6 @@
 package main
 
 import (
-	po_error "errors"
 	"os"
 
 	"github.com/juju/errors"
@@ -10,7 +9,6 @@ import (
 	log_prometheus "github.com/thehivecorporation/log/telemetry/prometheus"
 	"github.com/thehivecorporation/log/telemetry/statsd"
 	"github.com/thehivecorporation/log/writers/json"
-	"github.com/thehivecorporation/log/writers/text"
 )
 
 func main() {
@@ -30,7 +28,7 @@ func main() {
 	log.WithField("key2", "value").WithTag("db", "tag5").WithTag("endpoint", "tag6").Inc("counter3", 11).Info("Uf2")
 	log.Inc("counter3", 11).Info("Uf2")
 	log.WithField("errorkey", "errorvalue").Error("An error")
-	log.WithField("errorkey", "errorvalue").WithError(po_error.New("My error")).Error("Another error")
+	//log.WithField("errorkey", "errorvalue").WithError(po_error.New("My error")).Error("Another error")
 	log.WithField("database", "users").WithTag("database", "db1").Inc("counter", 1)
 
 	err := errors.New("An error")
@@ -47,11 +45,15 @@ func main() {
 	err = errors.Annotatef(err, "A wrapper")
 	log.WithError(err).Error("Error chungo")
 
-	log.SetWriter(text.New(os.Stdout))
-	log.Info("Changing level to info")
-	log.SetLevel(log.LevelInfo)
-	log.Warn("You should be reading this warn message")
-	log.Error("You should be reading this error message")
+	err = errors.Errorf("%d errors", 10)
+	err = errors.Annotatef(err, "A wrapper")
+	log.WithError(err).Error("MANY ERRORS")
+	//
+	//log.SetWriter(text.New(os.Stdout))
+	//log.Info("Changing level to info")
+	//log.SetLevel(log.LevelInfo)
+	//log.Warn("You should be reading this warn message")
+	//log.Error("You should be reading this error message")
 	log.Info("You should be reading this info message")
 	log.Debug("You shouldn't be reading this debug message")
 
