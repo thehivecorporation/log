@@ -75,6 +75,7 @@ func SetWriter(w Writer) {
 }
 
 func SetTelemetry(t Telemetry) {
+	t.SetLogger(&loggerPrototype)
 	loggerPrototype.telemetry = t
 	telemetryPrototype = t
 }
