@@ -54,11 +54,11 @@ type Fields map[string]interface{}
 type Level int
 
 type Logger interface {
-	Debug(msg string) Telemetry
-	Info(msg string) Telemetry
-	Warn(msg string) Telemetry
-	Error(msg string) Telemetry
-	Fatal(msg string) Telemetry
+	Debug(msg interface{}) Telemetry
+	Info(msg interface{}) Telemetry
+	Warn(msg interface{}) Telemetry
+	Error(msg interface{}) Telemetry
+	Fatal(msg interface{}) Telemetry
 
 	Debugf(msg string, v ...interface{}) Telemetry
 	Infof(msg string, v ...interface{}) Telemetry
@@ -78,12 +78,12 @@ type Logger interface {
 }
 
 type Payload struct {
-	Level     Level      `json:"level,omitempty"`
-	Messages  []string   `json:"messages,omitempty"`
-	Fields    Fields     `json:"fields,omitempty"`
-	Timestamp *time.Time `json:"ts,omitempty"`
-	Tags      Tags       `json:"tags,omitempty"`
-	Errors    []string   `json:"Errors,omitempty"`
+	Level     Level         `json:"level,omitempty"`
+	Messages  []interface{} `json:"messages,omitempty"`
+	Fields    Fields        `json:"fields,omitempty"`
+	Timestamp *time.Time    `json:"ts,omitempty"`
+	Tags      Tags          `json:"tags,omitempty"`
+	Errors    []string      `json:"Errors,omitempty"`
 }
 
 type Writer interface {

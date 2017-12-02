@@ -65,7 +65,7 @@ func runCollector(c Conf, tel *telemetryImpl) (err error) {
 	return
 }
 
-func (s *telemetryImpl) WithTag(k, v string) log.Telemetry {
+func (s *telemetryImpl) WithTag(k string, v string) log.Telemetry {
 	s.Tags[k] = v
 	return s
 }

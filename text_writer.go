@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -14,8 +15,16 @@ type TextWriter struct {
 	ErrorIOWriter io.Writer
 }
 
-func newTextWriter(w io.Writer) Writer {
-	return &TextWriter{IOWriter: w}
+func newTextWriter(w ...io.Writer) Writer {
+	switch len(w) {
+	case 1:
+		return &TextWriter{IOWriter: w[0], ErrorIOWriter: w[0]}
+	case 2:
+		return &TextWriter{IOWriter: w[0], ErrorIOWriter: w[1]}
+	default:
+		return &TextWriter{IOWriter: os.Stdout, ErrorIOWriter: os.Stderr}
+	}
+
 }
 
 func (w *TextWriter) WriteLog(p *Payload) {

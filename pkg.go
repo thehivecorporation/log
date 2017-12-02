@@ -1,22 +1,22 @@
 package log
 
-func Info(s string) Telemetry {
+func Info(s interface{}) Telemetry {
 	return newLogger(2).Info(s)
 }
 
-func Debug(s string) Telemetry {
+func Debug(s interface{}) Telemetry {
 	return newLogger(2).Debug(s)
 }
 
-func Error(s string) Telemetry {
+func Error(s interface{}) Telemetry {
 	return newLogger(2).Error(s)
 }
 
-func Warn(s string) Telemetry {
+func Warn(s interface{}) Telemetry {
 	return newLogger(2).Warn(s)
 }
 
-func Fatal(s string) Telemetry {
+func Fatal(s interface{}) Telemetry {
 	return newLogger(2).Fatal(s)
 }
 
@@ -48,7 +48,7 @@ func WithField(s string, v interface{}) Logger {
 	return newLogger(2).WithField(s, v)
 }
 
-func WithTag(k, v string) Telemetry {
+func WithTag(k string, v string) Telemetry {
 	return newTelemetry(newLogger(1)).WithTag(k, v)
 }
 

@@ -63,7 +63,7 @@ func (p *telemetryImpl) WithTags(t log.Tags) log.Telemetry {
 	return p
 }
 
-func (p *telemetryImpl) WithTag(k, v string) log.Telemetry {
+func (p *telemetryImpl) WithTag(k string, v string) log.Telemetry {
 	p.Tags[k] = v
 
 	return p
