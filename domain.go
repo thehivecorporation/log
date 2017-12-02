@@ -48,7 +48,6 @@ var levelStrings = map[string]Level{
 	"fatal":   LevelFatal,
 }
 
-//type Tags []string
 type Tags map[string]string
 type Fields map[string]interface{}
 type Level int

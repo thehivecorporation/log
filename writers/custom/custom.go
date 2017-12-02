@@ -1,13 +1,6 @@
 package custom
 
-import (
-	"encoding/json"
-	"fmt"
-
-	"io"
-
-	"github.com/thehivecorporation/log"
-)
+import "github.com/thehivecorporation/log"
 
 type writer struct {
 	w log.Writer

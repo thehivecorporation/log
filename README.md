@@ -48,12 +48,16 @@ At the same time a +1 with tag 'tag1' to the metric 'mycounter'
 Common functionality is covered by the following interface:
 
 ```go
+type Tags map[string]string
+type Fields map[string]interface{}
+type Level int
+
 type Logger interface {
-	Debug(msg string) Telemetry
-	Info(msg string) Telemetry
-	Warn(msg string) Telemetry
-	Error(msg string) Telemetry
-	Fatal(msg string) Telemetry
+	Debug(msg interface{}) Telemetry
+	Info(msg interface{}) Telemetry
+	Warn(msg interface{}) Telemetry
+	Error(msg interface{}) Telemetry
+	Fatal(msg interface{}) Telemetry
 
 	Debugf(msg string, v ...interface{}) Telemetry
 	Infof(msg string, v ...interface{}) Telemetry
@@ -63,11 +67,13 @@ type Logger interface {
 
 	WithField(s string, v interface{}) Logger
 	WithFields(Fields) Logger
-	WithError(error) Logger
+	WithError(...error) Logger
+	WithErrors(...error) Logger
 
-	WithTags(s ...string) Telemetry
+	WithTags(t Tags) Telemetry
+	WithTag(string, string) Telemetry
 
-	Clone() Logger
+	Clone(callStack int) Logger
 }
 ```
 
@@ -75,7 +81,8 @@ Using **`WithTags(s ...string) Telemetry`** will return an instance to use it wi
 
 ```go
 type Telemetry interface {
-	WithTags(s ...string) Telemetry
+	WithTags(t Tags) Telemetry
+	WithTag(string, string) Telemetry
 
 	Inc(name string, value float64, extra ...interface{}) Logger
 	Gauge(string, float64, ...interface{}) Logger
