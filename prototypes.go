@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-var loggerPrototype logger = logger{
+var loggerPrototype = logger{
 	fields:    Fields{},
 	telemetry: &mockTelemetry{},
 	start:     time.Now(),

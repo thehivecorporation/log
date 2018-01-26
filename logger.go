@@ -67,22 +67,22 @@ func (l *logger) Debugf(msg string, v ...interface{}) Telemetry {
 
 func (l *logger) Infof(msg string, v ...interface{}) Telemetry {
 	_, file, line, _ := runtime.Caller(l.callStack)
-	return l.checkLevelAndWriteLog(fmt.Sprintf("%s:%d %s", removeRootFromPath(file), line, msg), LevelError)
+	return l.checkLevelAndWriteLog(fmt.Sprintf("%s:%d %v", removeRootFromPath(file), line, fmt.Sprintf(msg, v...)), LevelInfo)
 }
 
 func (l *logger) Errorf(msg string, v ...interface{}) Telemetry {
 	_, file, line, _ := runtime.Caller(l.callStack)
-	return l.checkLevelAndWriteLog(fmt.Sprintf("%s:%d %s", removeRootFromPath(file), line, fmt.Sprintf(msg, v...)), LevelError)
+	return l.checkLevelAndWriteLog(fmt.Sprintf("%s:%d %v", removeRootFromPath(file), line, fmt.Sprintf(msg, v...)), LevelError)
 }
 
 func (l *logger) Warnf(msg string, v ...interface{}) Telemetry {
 	_, file, line, _ := runtime.Caller(l.callStack)
-	return l.checkLevelAndWriteLog(fmt.Sprintf("%s:%d %s", removeRootFromPath(file), line, fmt.Sprintf(msg, v...)), LevelWarn)
+	return l.checkLevelAndWriteLog(fmt.Sprintf("%s:%d %v", removeRootFromPath(file), line, fmt.Sprintf(msg, v...)), LevelWarn)
 }
 
 func (l *logger) Fatalf(msg string, v ...interface{}) Telemetry {
 	_, file, line, _ := runtime.Caller(l.callStack)
-	l.checkLevelAndWriteLog(fmt.Sprintf("%s:%d %s", removeRootFromPath(file), line, fmt.Sprintf(msg, v...)), LevelFatal)
+	l.checkLevelAndWriteLog(fmt.Sprintf("%s:%d %v", removeRootFromPath(file), line, fmt.Sprintf(msg, v...)), LevelFatal)
 
 	os.Exit(1)
 
