@@ -98,6 +98,7 @@ func (l logger) Clone(callStack int) Logger {
 	l.errors = make([]string, 0)
 	l.telemetry = telemetryPrototype
 	l.callStack = callStack
+	l.start = time.Now()
 
 	return &l
 }

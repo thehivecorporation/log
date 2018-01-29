@@ -42,5 +42,6 @@ func (m *mockTelemetry) WithTags(t Tags) Telemetry {
 
 func (m mockTelemetry) Clone() Telemetry {
 	m.Tags = Tags{}
+	m.Start = time.Now()
 	return &m
 }
