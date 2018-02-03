@@ -43,7 +43,6 @@ var LevelStrings = map[string]Level{
 	"debug":   LevelDebug,
 	"info":    LevelInfo,
 	"warn":    LevelWarn,
-	"warning": LevelWarn,
 	"error":   LevelError,
 	"fatal":   LevelFatal,
 }
