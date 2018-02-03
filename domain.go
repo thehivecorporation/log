@@ -39,7 +39,7 @@ var LevelNames = [...]string{
 	LevelFatal: "fatal",
 }
 
-var levelStrings = map[string]Level{
+var LevelStrings = map[string]Level{
 	"debug":   LevelDebug,
 	"info":    LevelInfo,
 	"warn":    LevelWarn,
