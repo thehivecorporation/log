@@ -38,10 +38,8 @@ func (w *TextWriter) WriteLog(p *Payload) {
 	w.Lock()
 	defer w.Unlock()
 
-	ts := time.Since(*p.Timestamp) / time.Second
-
 	for _, msg := range p.Messages {
-		fmt.Fprintf(writer, "\033[%dm%6s\033[0m[%04d] %-25s", Colors[p.Level], strings.ToUpper(LevelNames[p.Level]), ts, msg)
+		fmt.Fprintf(writer, "\033[%dm%6s\033[0m[%04d](%-25s) %-25s", Colors[p.Level], strings.ToUpper(LevelNames[p.Level]), p.ElapsedSinceStart, p.Timestamp.Format(time.RFC3339Nano), msg)
 	}
 
 	for k, value := range p.Fields {
@@ -57,6 +55,6 @@ func (w *TextWriter) WriteLog(p *Payload) {
 	fmt.Fprintln(writer)
 
 	for _, msg := range p.Errors {
-		fmt.Fprintf(writer, "\033[%dm%6s\033[0m[%04d]    %-25s\n", Colors[p.Level], strings.ToUpper(LevelNames[p.Level]), ts, msg)
+		fmt.Fprintf(writer, "\033[%dm%6s\033[0m[%04d]    %-25s\n", Colors[p.Level], strings.ToUpper(LevelNames[p.Level]), p.ElapsedSinceStart, msg)
 	}
 }

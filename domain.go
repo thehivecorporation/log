@@ -40,11 +40,11 @@ var LevelNames = [...]string{
 }
 
 var LevelStrings = map[string]Level{
-	"debug":   LevelDebug,
-	"info":    LevelInfo,
-	"warn":    LevelWarn,
-	"error":   LevelError,
-	"fatal":   LevelFatal,
+	"debug": LevelDebug,
+	"info":  LevelInfo,
+	"warn":  LevelWarn,
+	"error": LevelError,
+	"fatal": LevelFatal,
 }
 
 type Tags map[string]string
@@ -76,12 +76,13 @@ type Logger interface {
 }
 
 type Payload struct {
-	Level     Level         `json:"level,omitempty"`
-	Messages  []interface{} `json:"messages,omitempty"`
-	Fields    Fields        `json:"fields,omitempty"`
-	Timestamp *time.Time    `json:"ts,omitempty"`
-	Tags      Tags          `json:"tags,omitempty"`
-	Errors    []string      `json:"Errors,omitempty"`
+	Level             Level         `json:"level,omitempty"`
+	Messages          []interface{} `json:"messages,omitempty"`
+	Fields            Fields        `json:"fields,omitempty"`
+	Timestamp         time.Time     `json:"ts,omitempty"`
+	Tags              Tags          `json:"tags,omitempty"`
+	Errors            []string      `json:"Errors,omitempty"`
+	ElapsedSinceStart time.Duration `json:"ElapsedSinceStart,omitempty"`
 }
 
 type Writer interface {

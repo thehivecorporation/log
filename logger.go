@@ -98,7 +98,6 @@ func (l logger) Clone(callStack int) Logger {
 	l.errors = make([]string, 0)
 	l.telemetry = telemetryPrototype
 	l.callStack = callStack
-	l.start = time.Now()
 
 	return &l
 }
@@ -124,10 +123,11 @@ func (l *logger) WithTags(tags Tags) Telemetry {
 
 func (l *logger) errJujuStack(msg interface{}) Telemetry {
 	l.WriteLog(&Payload{
-		Messages:  []interface{}{msg},
-		Timestamp: &l.start,
-		Level:     LevelError,
-		Fields:    l.fields,
+		Messages:          []interface{}{msg},
+		ElapsedSinceStart: time.Since(l.start) / time.Second,
+		Timestamp:         time.Now(),
+		Level:             LevelError,
+		Fields:            l.fields,
 	})
 
 	return l.telemetry
@@ -145,11 +145,12 @@ func (l *logger) checkLevelAndWriteLog(msg interface{}, level Level) Telemetry {
 
 func (l *logger) writeLogCommon(msg interface{}, level Level) {
 	l.WriteLog(&Payload{
-		Messages:  []interface{}{msg},
-		Timestamp: &l.start,
-		Level:     level,
-		Fields:    l.fields,
-		Errors:    l.errors,
+		Messages:          []interface{}{msg},
+		ElapsedSinceStart: time.Since(l.start) / time.Second,
+		Timestamp:         time.Now(),
+		Level:             level,
+		Fields:            l.fields,
+		Errors:            l.errors,
 	})
 }
 

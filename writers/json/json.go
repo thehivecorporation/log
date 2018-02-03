@@ -8,6 +8,7 @@ import (
 
 	"github.com/thehivecorporation/log"
 	"os"
+	"time"
 )
 
 type writer struct {
@@ -16,6 +17,7 @@ type writer struct {
 }
 
 func (w *writer) WriteLog(p *log.Payload) {
+	p.Timestamp = time.Now()
 	byt, _ := json.Marshal(p)
 
 	if len(p.Errors) > 0 {
