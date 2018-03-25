@@ -56,9 +56,21 @@ func WithTags(tags Tags) Telemetry {
 	return newTelemetry(newLogger(1)).WithTags(tags)
 }
 
+func Histogram(name string, value float64, extra ...interface{}) Logger {
+	l := newLogger(1)
+	newTelemetry(l).Histogram(name, value, extra)
+	return l
+}
+
 func Inc(name string, value float64) Logger {
 	l := newLogger(1)
 	newTelemetry(l).Inc(name, value)
+	return l
+}
+
+func Gauge(name string, value float64) Logger {
+	l := newLogger(1)
+	newTelemetry(l).Gauge(name, value)
 	return l
 }
 

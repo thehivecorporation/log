@@ -18,7 +18,7 @@ func New(c client.HTTPConfig, points []client.BatchPointsConfig) log.Telemetry {
 		c:      cli,
 		points: make(map[string]client.BatchPoints),
 		Common: telemetry.Common{
-			Tags:  make([]string, 0),
+			Tags:  log.Tags{},
 			Start: time.Now(),
 		},
 		influxTags: make(map[string]string),
@@ -52,10 +52,6 @@ func (t *telemetryImpl) WithTags(s ...string) log.Telemetry {
 	return t
 }
 
-func (t *telemetryImpl) Inc(name string, value float64, extras ...interface{}) log.Logger {
-	return t.addPoint(name, value, extras)
-}
-
 func (t *telemetryImpl) addPoint(name string, value float64, extras ...interface{}) log.Logger {
 	var batchPoint client.BatchPoints
 	var fields map[string]interface{}
@@ -85,11 +81,19 @@ func (t *telemetryImpl) addPoint(name string, value float64, extras ...interface
 	return t.Logger
 }
 
+func (t *telemetryImpl) Inc(name string, value float64, extras ...interface{}) log.Logger {
+	return t.addPoint(name, value, extras)
+}
+
 func (t *telemetryImpl) Gauge(n string, v float64, extra ...interface{}) log.Logger {
 	return t.addPoint(n, v, extra)
 }
 
 func (t *telemetryImpl) Histogram(name string, value float64, extra ...interface{}) log.Logger {
+	return t.addPoint(name, value, extra)
+}
+
+func (t *telemetryImpl) Summary(name string, value float64, extra ...interface{}) log.Logger {
 	return t.addPoint(name, value, extra)
 }
 

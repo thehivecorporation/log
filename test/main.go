@@ -5,13 +5,20 @@ import (
 
 	"github.com/juju/errors"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/thehivecorporation/log"
-	log_prometheus "github.com/thehivecorporation/log/telemetry/prometheus"
+	"github.com/thehivecorporation/log/telemetry/prometheus"
 	"github.com/thehivecorporation/log/telemetry/statsd"
 	"github.com/thehivecorporation/log/writers/json"
+	"net/http"
+	"time"
+	"github.com/thehivecorporation/log/writers/text"
 )
 
 func main() {
+	//Now with prometheus
+	prometheusTest()
+
 	log.WithField("hello", "world").Info("Hello from external/main.go")
 
 	log.WithTags(log.Tags{"endpoint": "e1", "host": "h1"}).
@@ -74,11 +81,11 @@ func main() {
 
 	log.WithField("key", "value").WithTag("endpoint", "e4").Inc("mycounter", 1).Info("incremented")
 
-	//Now with prometheus
-	prometheusTest()
 }
 
 func prometheusTest() {
+	log.SetWriter(text.New(os.Stdout))
+
 	log.SetTelemetry(log_prometheus.New(
 		log_prometheus.Counters{
 			{
@@ -86,7 +93,7 @@ func prometheusTest() {
 					Name: "hd_errors_total",
 					Help: "Number of hard-disk errors.",
 				},
-				Labels: []string{"device"},
+				Labels: []string{"some_label"},
 			},
 		},
 		log_prometheus.Gauges{
@@ -106,6 +113,30 @@ func prometheusTest() {
 				Labels: []string{"some_label"},
 			}}))
 
-	log.WithTag("device", "d1").Inc("hd_errors_total", 1).Info("incremented")
-	log.WithTag("device", "d2").Inc("hd_errors_total", 1).WithField("objective", "device").Info("incremented")
+	go func() {
+		for {
+			log.WithTag("some_label", "d1").Inc("hd_errors_total", 1).Info("incremented")
+			time.Sleep(time.Second)
+		}
+	}()
+
+	go func() {
+		for {
+			log.WithTag("some_label", "d2").Gauge("gauge", 1).WithField("objective", "device2").Info("incremented")
+			time.Sleep(time.Second)
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
+
+	go func() {
+		for {
+			log.WithTag("some_label", "d2").Histogram("histogram", 1).WithField("objective", "device2").Info("incremented")
+			time.Sleep(time.Second)
+			time.Sleep(100 * time.Millisecond)
+		}
+	}()
+
+	http.Handle("/metrics", promhttp.Handler())
+
+	http.ListenAndServe(":8085", nil)
 }

@@ -12,6 +12,7 @@ type telemetryImpl struct {
 	counters   map[string]*prometheus.CounterVec
 	gauges     map[string]*prometheus.GaugeVec
 	histograms map[string]*prometheus.HistogramVec
+	summaries  map[string]*prometheus.SummaryVec
 }
 
 type Opt struct {
@@ -22,18 +23,26 @@ type Opts []Opt
 
 type Counters Opts
 type Gauges Opts
-
 type Histograms []Histogram
+
 type Histogram struct {
 	Options prometheus.HistogramOpts
 	Labels  []string
 }
 
-func New(c Counters, g Gauges, h Histograms) log.Telemetry {
+type Summaries []Summary
+
+type Summary struct {
+	Options prometheus.SummaryOpts
+	Labels  []string
+}
+
+func New(c Counters, g Gauges, h Histograms, s Summaries) log.Telemetry {
 	tel := telemetryImpl{
 		counters:   make(map[string]*prometheus.CounterVec),
 		histograms: make(map[string]*prometheus.HistogramVec),
 		gauges:     make(map[string]*prometheus.GaugeVec),
+		summaries:  make(map[string]*prometheus.SummaryVec),
 	}
 
 	for _, v := range c {
@@ -54,6 +63,12 @@ func New(c Counters, g Gauges, h Histograms) log.Telemetry {
 		tel.histograms[v.Options.Name] = histogram
 	}
 
+	for _, v := range s {
+		summary := prometheus.NewSummaryVec(v.Options, v.Labels)
+		prometheus.MustRegister(summary)
+		tel.summaries[v.Options.Name] = summary
+	}
+
 	return &tel
 }
 
@@ -70,34 +85,41 @@ func (p *telemetryImpl) WithTag(k string, v string) log.Telemetry {
 }
 
 func (p *telemetryImpl) Inc(name string, value float64, extra ...interface{}) log.Logger {
-	if p.counters[name] == nil {
+	if m, ok := p.counters[name]; !ok {
 		p.Logger.Errorf("Counter metric not found '%s'", name)
-		return p.Logger
+	} else {
+		m.With(map[string]string(p.Tags)).Add(value)
 	}
-
-	p.counters[name].With(map[string]string(p.Tags)).Add(value)
 
 	return p.Logger
 }
 
 func (p *telemetryImpl) Gauge(name string, value float64, extra ...interface{}) log.Logger {
-	if p.gauges[name] == nil {
+	if m, ok := p.gauges[name]; !ok {
 		p.Logger.Errorf("Gauge metric not found '%s'", name)
-		return p.Logger
+	} else {
+		m.With(map[string]string(p.Tags)).Set(value)
 	}
-
-	p.gauges[name].With(map[string]string(p.Tags)).Set(value)
 
 	return p.Logger
 }
 
 func (p *telemetryImpl) Histogram(name string, value float64, extra ...interface{}) log.Logger {
-	if p.histograms[name] == nil {
+	if m, ok := p.histograms[name]; !ok {
 		p.Logger.Errorf("Histogram metric not found '%s'", name)
-		return p.Logger
+	} else {
+		m.With(map[string]string(p.Tags)).Observe(value)
 	}
 
-	p.histograms[name].With(map[string]string(p.Tags)).Observe(value)
+	return p.Logger
+}
+
+func (p *telemetryImpl) Summary(name string, value float64, extra ...interface{}) log.Logger {
+	if m, ok := p.summaries[name]; !ok {
+		p.Logger.Errorf("Summary metric not found '%s'", name)
+	} else {
+		m.With(map[string]string(p.Tags)).Observe(value)
+	}
 
 	return p.Logger
 }

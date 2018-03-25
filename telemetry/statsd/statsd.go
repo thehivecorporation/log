@@ -36,10 +36,17 @@ func New(conf Conf) log.Telemetry {
 	}
 
 	c.Namespace = conf.Namespace
-	c.Tags = conf.Tags
+	if conf.Tags != nil {
+		c.Tags = conf.Tags
+	} else {
+		c.Tags = make([]string, 0)
+	}
 
 	tel := &telemetryImpl{
 		c: c,
+		Common: telemetry.Common{
+			Tags: make(map[string]string),
+		},
 	}
 
 	if conf.CollectMetrics != nil {
@@ -99,8 +106,16 @@ func (s *telemetryImpl) Histogram(name string, value float64, extra ...interface
 	return s.Logger
 }
 
+func (s *telemetryImpl) Summary(name string, value float64, extra ...interface{}) log.Logger {
+	if err := s.c.Histogram(name, value, s.getTagsAr(), 1); err != nil {
+		s.Logger.Error(err.Error())
+	}
+
+	return s.Logger
+}
+
 func (s telemetryImpl) Clone() log.Telemetry {
-	s.Tags = log.Tags{}
+	s.Tags = make(map[string]string)
 	return &s
 }
 
