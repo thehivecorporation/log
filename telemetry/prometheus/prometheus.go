@@ -98,7 +98,7 @@ func (p *telemetryImpl) Gauge(name string, value float64, extra ...interface{}) 
 	if m, ok := p.gauges[name]; !ok {
 		p.Logger.Errorf("Gauge metric not found '%s'", name)
 	} else {
-		m.With(map[string]string(p.Tags)).Set(value)
+		m.With(map[string]string(p.Tags)).Add(value)
 	}
 
 	return p.Logger
