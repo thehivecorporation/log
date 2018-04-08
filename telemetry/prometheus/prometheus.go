@@ -104,6 +104,16 @@ func (p *telemetryImpl) Gauge(name string, value float64, extra ...interface{}) 
 	return p.Logger
 }
 
+func (p *telemetryImpl) Fix(name string, value float64, extra ...interface{}) log.Logger {
+	if m, ok := p.gauges[name]; !ok {
+		p.Logger.Errorf("Gauge metric not found '%s'", name)
+	} else {
+		m.With(map[string]string(p.Tags)).Set(value)
+	}
+
+	return p.Logger
+}
+
 func (p *telemetryImpl) Histogram(name string, value float64, extra ...interface{}) log.Logger {
 	if m, ok := p.histograms[name]; !ok {
 		p.Logger.Errorf("Histogram metric not found '%s'", name)

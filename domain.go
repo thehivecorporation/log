@@ -95,6 +95,7 @@ type Telemetry interface {
 
 	Inc(name string, value float64, extra ...interface{}) Logger
 	Gauge(string, float64, ...interface{}) Logger
+	Fix(string, float64, ...interface{}) Logger
 	Histogram(name string, value float64, extra ...interface{}) Logger
 	Summary(name string, value float64, extra ...interface{}) Logger
 

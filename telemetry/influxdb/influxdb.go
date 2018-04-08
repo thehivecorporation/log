@@ -89,6 +89,11 @@ func (t *telemetryImpl) Gauge(n string, v float64, extra ...interface{}) log.Log
 	return t.addPoint(n, v, extra)
 }
 
+
+func (t *telemetryImpl) Fix(n string, v float64, extra ...interface{}) log.Logger {
+	return t.addPoint(n, v, extra)
+}
+
 func (t *telemetryImpl) Histogram(name string, value float64, extra ...interface{}) log.Logger {
 	return t.addPoint(name, value, extra)
 }

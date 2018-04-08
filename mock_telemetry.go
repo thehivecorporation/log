@@ -15,6 +15,11 @@ func (m *mockTelemetry) Gauge(_ string, _ float64, _ ...interface{}) Logger {
 	return m.Logger
 }
 
+func (m *mockTelemetry) Fix(_ string, _ float64, _ ...interface{}) Logger {
+	//fmt.Println("GAUGE", m.Tags)
+	return m.Logger
+}
+
 func (m *mockTelemetry) Histogram(_ string, _ float64, _ ...interface{}) Logger {
 	//fmt.Println("HIST", m.Tags)
 	return m.Logger

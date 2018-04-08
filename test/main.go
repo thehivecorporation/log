@@ -111,7 +111,7 @@ func prometheusTest() {
 					Help: "some help",
 				},
 				Labels: []string{"some_label"},
-			}}))
+			}},nil))
 
 	go func() {
 		for {

@@ -40,6 +40,14 @@ func (t *telemetryImpl) Gauge(name string, value float64, extra ...interface{}) 
 	return t.Logger
 }
 
+func (t *telemetryImpl) Fix(name string, value float64, extra ...interface{}) log.Logger {
+	for _, i := range t.impls {
+		i.Fix(name, value, extra)
+	}
+
+	return t.Logger
+}
+
 func (t *telemetryImpl) Histogram(name string, value float64, extra ...interface{}) log.Logger {
 	for _, i := range t.impls {
 		i.Histogram(name, value, extra)
