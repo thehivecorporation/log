@@ -80,6 +80,12 @@ func Gauge(name string, value float64) Logger {
 	return l
 }
 
+func Fix(name string, value float64) Logger {
+	l := newLogger(1)
+	newTelemetry(l).Fix(name, value)
+	return l
+}
+
 func WithError(err ...error) Logger {
 	return newLogger(1).WithError(err...)
 }
