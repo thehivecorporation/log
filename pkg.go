@@ -62,6 +62,12 @@ func Histogram(name string, value float64, extra ...interface{}) Logger {
 	return l
 }
 
+func Summary(name string, value float64, extra ...interface{}) Logger {
+	l := newLogger(1)
+	newTelemetry(l).Summary(name, value, extra)
+	return l
+}
+
 func Inc(name string, value float64) Logger {
 	l := newLogger(1)
 	newTelemetry(l).Inc(name, value)
