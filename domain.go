@@ -47,16 +47,20 @@ var LevelStrings = map[string]Level{
 	"fatal": LevelFatal,
 }
 
+func LevelFromString(s string)Level {
+	return LevelStrings[s]
+}
+
 type Tags map[string]string
 type Fields map[string]interface{}
 type Level int
 
 type Logger interface {
-	Debug(msg interface{}) Telemetry
-	Info(msg interface{}) Telemetry
-	Warn(msg interface{}) Telemetry
-	Error(msg interface{}) Telemetry
-	Fatal(msg interface{}) Telemetry
+	Debug(msg interface{}, more ...interface{}) Telemetry
+	Info(msg interface{}, more ...interface{}) Telemetry
+	Warn(msg interface{}, more ...interface{}) Telemetry
+	Error(msg interface{}, more ...interface{}) Telemetry
+	Fatal(msg interface{}, more ...interface{}) Telemetry
 
 	Debugf(msg string, v ...interface{}) Telemetry
 	Infof(msg string, v ...interface{}) Telemetry

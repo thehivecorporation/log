@@ -16,9 +16,17 @@ func New(ts ...log.Telemetry) log.Telemetry {
 	}
 }
 
-func (t *telemetryImpl) WithTags(s ...string) log.Telemetry {
+func (t *telemetryImpl) WithTags(s log.Tags) log.Telemetry {
 	for _, i := range t.impls {
-		i.WithTags(s...)
+		i.WithTags(s)
+	}
+
+	return t
+}
+
+func (t *telemetryImpl) WithTag(k, v string) log.Telemetry {
+	for _, i := range t.impls {
+		i.WithTag(k, v)
 	}
 
 	return t
@@ -51,6 +59,14 @@ func (t *telemetryImpl) Fix(name string, value float64, extra ...interface{}) lo
 func (t *telemetryImpl) Histogram(name string, value float64, extra ...interface{}) log.Logger {
 	for _, i := range t.impls {
 		i.Histogram(name, value, extra)
+	}
+
+	return t.Logger
+}
+
+func (t *telemetryImpl) Summary(name string, value float64, extra ...interface{}) log.Logger {
+	for _, i := range t.impls {
+		i.Summary(name, value, extra)
 	}
 
 	return t.Logger

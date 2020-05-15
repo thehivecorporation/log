@@ -6,11 +6,12 @@ import (
 )
 
 var loggerPrototype = logger{
-	fields:    Fields{},
-	telemetry: &mockTelemetry{},
-	start:     time.Now(),
-	Writer:    newTextWriter(os.Stdout),
-	level:     LevelDebug,
+	fields:       Fields{},
+	telemetry:    &mockTelemetry{},
+	start:        time.Now(),
+	Writer:       newTextWriter(os.Stdout),
+	level:        LevelInfo,
+	includeStack: true,
 }
 
 var telemetryPrototype Telemetry = &mockTelemetry{

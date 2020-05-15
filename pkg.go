@@ -1,23 +1,23 @@
 package log
 
-func Info(s interface{}) Telemetry {
+func Info(s interface{}, more ...interface{}) Telemetry {
 	return newLogger(2).Info(s)
 }
 
-func Debug(s interface{}) Telemetry {
-	return newLogger(2).Debug(s)
+func Debug(s interface{}, more ...interface{}) Telemetry {
+	return newLogger(2).Debug(s, more...)
 }
 
-func Error(s interface{}) Telemetry {
-	return newLogger(2).Error(s)
+func Error(s interface{}, more ...interface{}) Telemetry {
+	return newLogger(2).Error(s, more...)
 }
 
-func Warn(s interface{}) Telemetry {
-	return newLogger(2).Warn(s)
+func Warn(s interface{}, more ...interface{}) Telemetry {
+	return newLogger(2).Warn(s, more...)
 }
 
-func Fatal(s interface{}) Telemetry {
-	return newLogger(2).Fatal(s)
+func Fatal(s interface{}, more ...interface{}) Telemetry {
+	return newLogger(2).Fatal(s, more...)
 }
 
 func Infof(s string, i ...interface{}) Telemetry {
@@ -96,6 +96,10 @@ func SetLevel(l Level) {
 
 func SetWriter(w Writer) {
 	loggerPrototype.Writer = w
+}
+
+func DisableStackInfo() {
+	loggerPrototype.includeStack = false
 }
 
 func SetTelemetry(t Telemetry) {
