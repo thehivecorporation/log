@@ -8,11 +8,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/thehivecorporation/log"
 	"github.com/thehivecorporation/log/telemetry/prometheus"
-	"github.com/thehivecorporation/log/telemetry/statsd"
 	"github.com/thehivecorporation/log/writers/json"
+	"github.com/thehivecorporation/log/writers/text"
 	"net/http"
 	"time"
-	"github.com/thehivecorporation/log/writers/text"
 )
 
 func main() {
@@ -72,12 +71,6 @@ func main() {
 	log.Debug("You shouldn't be reading this debug message")
 
 	//Now with statsd
-	log.SetLevel(log.LevelDebug)
-	log.SetWriter(json.New(os.Stdout))
-	log.SetTelemetry(statsd.New(statsd.Conf{
-		Address:   "localhost:9125",
-		Namespace: "myapp.",
-	}))
 
 	log.WithField("key", "value").WithTag("endpoint", "e4").Inc("mycounter", 1).Info("incremented")
 
