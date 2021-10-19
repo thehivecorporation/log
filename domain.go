@@ -76,7 +76,7 @@ type Logger interface {
 	WithTags(t Tags) Telemetry
 	WithTag(string, string) Telemetry
 
-	Clone(callStack int) Logger
+	Clone() Logger
 }
 
 type Payload struct {

@@ -1,93 +1,93 @@
 package log
 
 func Info(s interface{}, more ...interface{}) Telemetry {
-	return newLogger(2).Info(s)
+	return newLogger().Info(s)
 }
 
 func Debug(s interface{}, more ...interface{}) Telemetry {
-	return newLogger(2).Debug(s, more...)
+	return newLogger().Debug(s, more...)
 }
 
 func Error(s interface{}, more ...interface{}) Telemetry {
-	return newLogger(2).Error(s, more...)
+	return newLogger().Error(s, more...)
 }
 
 func Warn(s interface{}, more ...interface{}) Telemetry {
-	return newLogger(2).Warn(s, more...)
+	return newLogger().Warn(s, more...)
 }
 
 func Fatal(s interface{}, more ...interface{}) Telemetry {
-	return newLogger(2).Fatal(s, more...)
+	return newLogger().Fatal(s, more...)
 }
 
 func Infof(s string, i ...interface{}) Telemetry {
-	return newLogger(2).Infof(s, i...)
+	return newLogger().Infof(s, i...)
 }
 
 func Debugf(s string, i ...interface{}) Telemetry {
-	return newLogger(2).Debugf(s, i...)
+	return newLogger().Debugf(s, i...)
 }
 
 func Errorf(s string, i ...interface{}) Telemetry {
-	return newLogger(2).Errorf(s, i...)
+	return newLogger().Errorf(s, i...)
 }
 
 func Warnf(s string, i ...interface{}) Telemetry {
-	return newLogger(2).Warnf(s, i...)
+	return newLogger().Warnf(s, i...)
 }
 
 func Fatalf(s string, i ...interface{}) Telemetry {
-	return newLogger(2).Fatalf(s, i...)
+	return newLogger().Fatalf(s, i...)
 }
 
 func WithFields(f Fields) Logger {
-	return newLogger(2).WithFields(f)
+	return newLogger().WithFields(f)
 }
 
 func WithField(s string, v interface{}) Logger {
-	return newLogger(2).WithField(s, v)
+	return newLogger().WithField(s, v)
 }
 
 func WithTag(k string, v string) Telemetry {
-	return newTelemetry(newLogger(1)).WithTag(k, v)
+	return newTelemetry(newLogger()).WithTag(k, v)
 }
 
 func WithTags(tags Tags) Telemetry {
-	return newTelemetry(newLogger(1)).WithTags(tags)
+	return newTelemetry(newLogger()).WithTags(tags)
 }
 
 func Histogram(name string, value float64, extra ...interface{}) Logger {
-	l := newLogger(1)
+	l := newLogger()
 	newTelemetry(l).Histogram(name, value, extra)
 	return l
 }
 
 func Summary(name string, value float64, extra ...interface{}) Logger {
-	l := newLogger(1)
+	l := newLogger()
 	newTelemetry(l).Summary(name, value, extra)
 	return l
 }
 
 func Inc(name string, value float64) Logger {
-	l := newLogger(1)
+	l := newLogger()
 	newTelemetry(l).Inc(name, value)
 	return l
 }
 
 func Gauge(name string, value float64) Logger {
-	l := newLogger(1)
+	l := newLogger()
 	newTelemetry(l).Gauge(name, value)
 	return l
 }
 
 func Fix(name string, value float64) Logger {
-	l := newLogger(1)
+	l := newLogger()
 	newTelemetry(l).Fix(name, value)
 	return l
 }
 
 func WithError(err ...error) Logger {
-	return newLogger(1).WithError(err...)
+	return newLogger().WithError(err...)
 }
 
 func SetLevel(l Level) {
