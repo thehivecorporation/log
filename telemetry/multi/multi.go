@@ -79,7 +79,7 @@ func (t telemetryImpl) Clone() log.Telemetry {
 		t.impls[i] = v.Clone()
 	}
 
-	t.Tags = make([]string, 0)
+	t.Tags = make(map[string]string, 0)
 
 	return &t
 }
