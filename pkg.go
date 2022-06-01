@@ -22,7 +22,7 @@ func Fatal(s interface{}, more ...interface{}) Telemetry {
 
 func FatalIfError(err error) Telemetry {
 	if err == nil {
-		newTelemetry(newDummy(2))
+		return newTelemetry(newDummy(2))
 	}
 
 	return newLogger().Fatal(err.Error())

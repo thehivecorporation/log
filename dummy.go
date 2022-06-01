@@ -4,43 +4,43 @@ type dummyLogger struct {
 	telemetry Telemetry
 }
 
-func (d dummyLogger) Debug(msg interface{}) Telemetry {
+func (d dummyLogger) Debug(_ interface{}, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Info(msg interface{}) Telemetry {
+func (d dummyLogger) Info(_ interface{}, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Warn(msg interface{}) Telemetry {
+func (d dummyLogger) Warn(_ interface{}, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Error(msg interface{}) Telemetry {
+func (d dummyLogger) Error(_ interface{}, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Fatal(msg interface{}) Telemetry {
+func (d dummyLogger) Fatal(_ interface{}, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Debugf(msg string, v ...interface{}) Telemetry {
+func (d dummyLogger) Debugf(_ string, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Infof(msg string, v ...interface{}) Telemetry {
+func (d dummyLogger) Infof(_ string, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Warnf(msg string, v ...interface{}) Telemetry {
+func (d dummyLogger) Warnf(_ string, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Errorf(msg string, v ...interface{}) Telemetry {
+func (d dummyLogger) Errorf(_ string, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) Fatalf(msg string, v ...interface{}) Telemetry {
+func (d dummyLogger) Fatalf(_ string, _ ...interface{}) Telemetry {
 	return d.telemetry
 }
 
@@ -48,26 +48,26 @@ func (d *dummyLogger) WithField(s string, v interface{}) Logger {
 	return d
 }
 
-func (d *dummyLogger) WithFields(fields Fields) Logger {
+func (d *dummyLogger) WithFields(_ Fields) Logger {
 	return d
 }
 
-func (d *dummyLogger) WithError(err ...error) Logger {
+func (d *dummyLogger) WithError(_ ...error) Logger {
 	return d
 }
 
-func (d *dummyLogger) WithErrors(err ...error) Logger {
+func (d *dummyLogger) WithErrors(_ ...error) Logger {
 	return d
 }
 
-func (d dummyLogger) WithTags(t Tags) Telemetry {
+func (d dummyLogger) WithTags(_ Tags) Telemetry {
 	return d.telemetry
 }
 
-func (d dummyLogger) WithTag(s string, s2 string) Telemetry {
+func (d dummyLogger) WithTag(_ string, _ string) Telemetry {
 	return d.telemetry
 }
 
-func (d *dummyLogger) Clone(callStack int) Logger {
+func (d *dummyLogger) Clone() Logger {
 	return d
 }
