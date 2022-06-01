@@ -72,6 +72,7 @@ func main() {
 
 	log.WithField("key", "value").WithTag("endpoint", "e4").Inc("mycounter", 1).Info("incremented")
 
-	log.FatalIfError(nil, "no fatal")
+	log.FatalIfError(nil)
+	log.FatalIfErrorS(nil, "no fatal")
 	//log.FatalIfError(errors.New("error"), "fatal")
 }
