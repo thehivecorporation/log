@@ -10,3 +10,7 @@ func newTelemetry(l Logger) Telemetry {
 func newLogger(callStack int) Logger {
 	return loggerPrototype.Clone(callStack)
 }
+
+func newDummy(_ int) Logger {
+	return &dummyLogger{}
+}
