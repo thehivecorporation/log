@@ -4,21 +4,11 @@ import (
 	"os"
 
 	"github.com/juju/errors"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/thehivecorporation/log"
-	"github.com/thehivecorporation/log/telemetry/prometheus"
-	"github.com/thehivecorporation/log/telemetry/statsd"
 	"github.com/thehivecorporation/log/writers/json"
-	"net/http"
-	"time"
-	"github.com/thehivecorporation/log/writers/text"
 )
 
 func main() {
-	//Now with prometheus
-	prometheusTest()
-
 	log.WithField("hello", "world").Info("Hello from external/main.go")
 
 	log.WithTags(log.Tags{"endpoint": "e1", "host": "h1"}).
@@ -74,69 +64,14 @@ func main() {
 	//Now with statsd
 	log.SetLevel(log.LevelDebug)
 	log.SetWriter(json.New(os.Stdout))
-	log.SetTelemetry(statsd.New(statsd.Conf{
-		Address:   "localhost:9125",
-		Namespace: "myapp.",
-	}))
+	///FIXME
+	//log.SetTelemetry(statsd.New(statsd.Conf{
+	//	Address:   "localhost:9125",
+	//	Namespace: "myapp.",
+	//}))
 
 	log.WithField("key", "value").WithTag("endpoint", "e4").Inc("mycounter", 1).Info("incremented")
 
-}
-
-func prometheusTest() {
-	log.SetWriter(text.New(os.Stdout))
-
-	log.SetTelemetry(log_prometheus.New(
-		log_prometheus.Counters{
-			{
-				Options: prometheus.Opts{
-					Name: "hd_errors_total",
-					Help: "Number of hard-disk errors.",
-				},
-				Labels: []string{"some_label"},
-			},
-		},
-		log_prometheus.Gauges{
-			{
-				Options: prometheus.Opts{
-					Name: "gauge",
-					Help: "some help",
-				},
-				Labels: []string{"some_label"},
-			}},
-		log_prometheus.Histograms{
-			{
-				Options: prometheus.HistogramOpts{
-					Name: "histogram",
-					Help: "some help",
-				},
-				Labels: []string{"some_label"},
-			}},nil))
-
-	go func() {
-		for {
-			log.WithTag("some_label", "d1").Inc("hd_errors_total", 1).Info("incremented")
-			time.Sleep(time.Second)
-		}
-	}()
-
-	go func() {
-		for {
-			log.WithTag("some_label", "d2").Gauge("gauge", 1).WithField("objective", "device2").Info("incremented")
-			time.Sleep(time.Second)
-			time.Sleep(100 * time.Millisecond)
-		}
-	}()
-
-	go func() {
-		for {
-			log.WithTag("some_label", "d2").Histogram("histogram", 1).WithField("objective", "device2").Info("incremented")
-			time.Sleep(time.Second)
-			time.Sleep(100 * time.Millisecond)
-		}
-	}()
-
-	http.Handle("/metrics", promhttp.Handler())
-
-	http.ListenAndServe(":8085", nil)
+	log.FatalIfError(nil, "no fatal")
+	//log.FatalIfError(errors.New("error"), "fatal")
 }
