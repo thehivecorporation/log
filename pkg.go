@@ -20,6 +20,21 @@ func Fatal(s interface{}, more ...interface{}) Telemetry {
 	return newLogger().Fatal(s, more...)
 }
 
+func FatalIfError(err error, s interface{}) Telemetry {
+	if err == nil {
+		return newTelemetry(newDummy(2))
+	}
+	return newLogger(2).Fatal(s)
+}
+
+func FatalFIfError(err error, s string, i ...interface{}) Telemetry {
+	if err == nil {
+		return newTelemetry(newDummy(2))
+	}
+
+	return newLogger(2).Fatalf(s, i...)
+}
+
 func Infof(s string, i ...interface{}) Telemetry {
 	return newLogger().Infof(s, i...)
 }
