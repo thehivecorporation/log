@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/beorn7/perks v0.0.0-20160804104726-4c0e84591b9a // indirect
+	github.com/fatih/color v1.13.0
 	github.com/go-logfmt/logfmt v0.3.0
 	github.com/golang/protobuf v0.0.0-20171113180720-1e59b77b52bf // indirect
 	github.com/influxdata/influxdb v1.4.2

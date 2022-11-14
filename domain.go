@@ -1,6 +1,10 @@
 package log
 
-import "time"
+import (
+	"time"
+
+	"github.com/fatih/color"
+)
 
 // colors.
 const (
@@ -23,12 +27,12 @@ const (
 )
 
 // Colors mapping.
-var Colors = [...]int{
-	LevelDebug: gray,
-	LevelInfo:  blue,
-	LevelWarn:  yellow,
-	LevelError: red,
-	LevelFatal: red,
+var Colors = [...]color.Attribute{
+	LevelDebug: color.FgWhite,
+	LevelInfo:  color.FgBlue,
+	LevelWarn:  color.FgYellow,
+	LevelError: color.FgRed,
+	LevelFatal: color.FgRed,
 }
 
 var LevelNames = [...]string{
@@ -47,7 +51,7 @@ var LevelStrings = map[string]Level{
 	"fatal": LevelFatal,
 }
 
-func LevelFromString(s string)Level {
+func LevelFromString(s string) Level {
 	return LevelStrings[s]
 }
 

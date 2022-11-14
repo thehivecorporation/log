@@ -3,10 +3,11 @@ package log
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/fatih/color"
 )
 
 type TextWriter struct {
@@ -22,7 +23,7 @@ func newTextWriter(w ...io.Writer) Writer {
 	case 2:
 		return &TextWriter{IOWriter: w[0], ErrorIOWriter: w[1]}
 	default:
-		return &TextWriter{IOWriter: os.Stdout, ErrorIOWriter: os.Stderr}
+		return &TextWriter{IOWriter: color.Output, ErrorIOWriter: color.Error}
 	}
 
 }
@@ -38,23 +39,48 @@ func (w *TextWriter) WriteLog(p *Payload) {
 	w.Lock()
 	defer w.Unlock()
 
-	for _, msg := range p.Messages {
-		fmt.Fprintf(writer, "\033[%dm%6s\033[0m[%04d](%-25s) %-25s", Colors[p.Level], strings.ToUpper(LevelNames[p.Level]), p.ElapsedSinceStart, p.Timestamp.Format(time.RFC3339Nano), msg)
-	}
-
-	for k, value := range p.Fields {
-		fmt.Fprintf(writer, " \033[%dm%s\033[0m=%v", Colors[p.Level], k, value)
-	}
-
-	if len(p.Tags) > 0 {
-		for k, v := range p.Tags {
-			fmt.Fprintf(writer, " \033[%dm%s|%s\033[0m", Colors[p.Level], k, v)
-		}
-	}
+	writeMessage(writer, p)
+	writeFields(writer, p)
+	writeTags(writer, p)
 
 	fmt.Fprintln(writer)
 
+	writeErrors(writer, p)
+}
+
+func writeErrors(w io.Writer, p *Payload) {
+	attr := Colors[p.Level]
+	level := color.New(attr)
+
 	for _, msg := range p.Errors {
-		fmt.Fprintf(writer, "\033[%dm%6s\033[0m[%04d]    %-25s\n", Colors[p.Level], strings.ToUpper(LevelNames[p.Level]), p.ElapsedSinceStart, msg)
+		level.Fprintln(w, "%6s\033[0m[%04d]    %-25s", strings.ToUpper(LevelNames[p.Level]), p.ElapsedSinceStart, msg)
+	}
+}
+
+func writeTags(w io.Writer, p *Payload) {
+	attr := Colors[p.Level]
+	level := color.New(attr)
+
+	if len(p.Tags) > 0 {
+		for k, v := range p.Tags {
+			level.Fprintf(w, " %s|%s\033[0m", k, v)
+		}
+	}
+}
+
+func writeFields(w io.Writer, p *Payload) {
+	attr := Colors[p.Level]
+	level := color.New(attr)
+	for k, v := range p.Fields {
+		level.Fprintf(w, " %s\033[0m=%v", k, v)
+	}
+}
+
+func writeMessage(w io.Writer, p *Payload) {
+	attr := Colors[p.Level]
+	level := color.New(attr)
+	for _, msg := range p.Messages {
+		level.Fprintf(w, "%6s", strings.ToUpper(LevelNames[p.Level]))
+		fmt.Fprintf(w, "[%04d](%-25s) %-25s", p.ElapsedSinceStart, p.Timestamp.Format(time.RFC3339Nano), msg)
 	}
 }
